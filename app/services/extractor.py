@@ -1,6 +1,6 @@
 # app/services/extractor.py
 
-from typing import Optional
+from typing import Any, Dict, Optional
 from app.models.paper import Paper
 from app.services.llm import LLMClient
 from app.utils.json_utils import safe_json_parse
@@ -44,7 +44,7 @@ class PaperExtractor:
         self.llm = llm
         self.max_retries = max_retries
 
-    def extract(self, content: str) -> Optional[Paper]:
+    def extract(self, content: str, defaults: Optional[Dict[str, Any]] = None) -> Optional[Paper]:
         """
         Main extraction entrypoint.
 
@@ -63,7 +63,7 @@ class PaperExtractor:
                 if not data:
                     raise ValueError("Empty or invalid JSON")
 
-                paper = Paper(**data)
+                paper = self._build_paper(data, defaults or {})
 
                 return paper
 
@@ -72,3 +72,25 @@ class PaperExtractor:
                     return None
 
         return None
+
+    def _build_paper(self, data: Dict[str, Any], defaults: Dict[str, Any]) -> Paper:
+        # Keep required metadata stable even when the model omits them.
+        merged = dict(data)
+        merged["paper_id"] = merged.get("paper_id") or defaults.get("paper_id", "unknown-paper")
+        merged["title"] = merged.get("title") or defaults.get("title", "untitled-paper")
+        merged["year"] = merged.get("year") or defaults.get("year", 0)
+        merged["abstract"] = merged.get("abstract") or defaults.get("abstract")
+        return Paper(**merged)
+
+    def run(self, raw_paper: dict) -> Optional[Paper]:
+        abstract = raw_paper.get("summary") or raw_paper.get("abstract") or ""
+        defaults = {
+            "paper_id": raw_paper.get("paper_id") or raw_paper.get("id"),
+            "title": raw_paper.get("title"),
+            "year": raw_paper.get("year"),
+            "abstract": abstract,
+        }
+        return self.extract(abstract, defaults=defaults)
+
+
+Extractor = PaperExtractor
