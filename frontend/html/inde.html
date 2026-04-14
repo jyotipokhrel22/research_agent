@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Agent</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Research Agent</h1>
+        
+        <!-- Search box -->
+        <input type="text" id="search-input" placeholder="Search papers...">
+        <button onclick="handleSearch()">Search</button>
+
+        <!-- Results -->
+        <div id="results-container"></div>
+    </div>
+
+    <script src="../js/api.js"></script>
+
+    <script>
+        // Login check
+        window.onload = function() {
+            if (!isLoggedIn()) {
+                window.location.href = "login.html"
+            }
+        }
+
+        // Search 
+        async function handleSearch() {
+            const papers = await fetchPapers()
+            const container = document.getElementById("results-container")
+            container.innerHTML = ""
+            papers.forEach(paper => {
+                container.innerHTML += `
+                    <div>
+                        <h3>${paper.title}</h3>
+                        <p>${paper.authors.join(", ")}</p>
+                        <p>${paper.year}</p>
+                        <p>${paper.abstract}</p>
+                    </div>
+                `
+            })
+        }
+
+        // Logout
+        function handleLogout() {
+            logout()
+        }
+    </script>
+
+</body>
+</html>
