@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from bson import ObjectId
 from app.models.report import Report
+from app.api.dependencies import get_current_user
 from app.db.session import reports_collection
 
 router = APIRouter()
@@ -25,7 +26,7 @@ async def get_report_or_404(report_id: str) -> dict:
     return report
 
 @router.post("/reports", status_code=status.HTTP_201_CREATED)
-async def create_report(report: Report):
+async def create_report(report: Report, current_user: dict = Depends(get_current_user)):
     new_report = await reports_collection.insert_one(report.dict())
     return {
         "message": "Report added successfully",
@@ -33,7 +34,7 @@ async def create_report(report: Report):
     }
 
 @router.get("/reports", status_code=status.HTTP_200_OK)
-async def get_reports():
+async def get_reports(current_user: dict = Depends(get_current_user)):
     reports = []
     async for r in reports_collection.find():
         r["_id"] = str(r["_id"])
@@ -41,11 +42,11 @@ async def get_reports():
     return reports
 
 @router.get("/reports/{report_id}", status_code=status.HTTP_200_OK)
-async def get_report(report_id: str):
+async def get_report(report_id: str, current_user: dict = Depends(get_current_user)):
     return await get_report_or_404(report_id)
 
 @router.put("/reports/{report_id}", status_code=status.HTTP_200_OK)
-async def update_report(report_id: str, report: Report):
+async def update_report(report_id: str, report: Report, current_user: dict = Depends(get_current_user)):
     oid = validate_object_id(report_id, "Report ID")
     updated = await reports_collection.update_one(
         {"_id": oid}, {"$set": report.dict()}
@@ -58,7 +59,7 @@ async def update_report(report_id: str, report: Report):
     return {"message": "Report updated successfully"}
 
 @router.delete("/reports/{report_id}", status_code=status.HTTP_200_OK)
-async def delete_report(report_id: str):
+async def delete_report(report_id: str, current_user: dict = Depends(get_current_user)):
     oid = validate_object_id(report_id, "Report ID")
     deleted = await reports_collection.delete_one({"_id": oid})
     if deleted.deleted_count == 0:

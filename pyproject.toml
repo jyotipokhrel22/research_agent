@@ -1,0 +1,16 @@
+[project]
+name = "research-agent"
+version = "0.1.0"
+description = "AI-powered research agent"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "motor",
+    "python-jose[cryptography]",
+    "passlib[argon2]",
+    "argon2-cffi",
+    "python-dotenv",
+    "anthropic",
+    "python-multipart",
+    "pydantic[email]",
+]

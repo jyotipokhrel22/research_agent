@@ -1,25 +1,18 @@
-// Base URL and API Key
 const BASE_URL = "http://127.0.0.1:8000"
-const API_KEY = "mysecretkey123"
 
-// Common headers
 function getHeaders() {
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
     return {
-        "x-api-key": API_KEY,
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-    }
+        "Authorization": `Bearer ${token}`,
+        "x-api-key": "your_api_key_here" 
+    };
 }
 
-// AUTH 
-
-// Signup
 async function signup(username, email, password, role) {
     const response = await fetch(`${BASE_URL}/signup`, {
         method: "POST",
         headers: {
-            "x-api-key": API_KEY,
             "Content-Type": "application/json"
         },
         body: JSON.stringify({ username, email, password, role })
@@ -27,39 +20,30 @@ async function signup(username, email, password, role) {
     return await response.json()
 }
 
-// Login
 async function login(username, password) {
     const response = await fetch(`${BASE_URL}/login`, {
         method: "POST",
         headers: {
-            "x-api-key": API_KEY,
             "Content-Type": "application/x-www-form-urlencoded"
         },
         body: `username=${username}&password=${password}`
     })
     const data = await response.json()
-    
-    // save token
     if (data.access_token) {
         localStorage.setItem("token", data.access_token)
     }
     return data
 }
 
-// Logout
 function logout() {
     localStorage.removeItem("token")
     window.location.href = "index.html"
 }
 
-// check login
 function isLoggedIn() {
     return localStorage.getItem("token") !== null
 }
 
-// PAPERS 
-
-// fetch all papers
 async function fetchPapers() {
     const response = await fetch(`${BASE_URL}/papers`, {
         method: "GET",
@@ -68,7 +52,6 @@ async function fetchPapers() {
     return await response.json()
 }
 
-// fetch single paper
 async function fetchPaper(paper_id) {
     const response = await fetch(`${BASE_URL}/papers/${paper_id}`, {
         method: "GET",
@@ -77,7 +60,6 @@ async function fetchPaper(paper_id) {
     return await response.json()
 }
 
-// add paper
 async function addPaper(paperData) {
     const response = await fetch(`${BASE_URL}/papers`, {
         method: "POST",
@@ -87,7 +69,6 @@ async function addPaper(paperData) {
     return await response.json()
 }
 
-// update paper
 async function updatePaper(paper_id, paperData) {
     const response = await fetch(`${BASE_URL}/papers/${paper_id}`, {
         method: "PUT",
@@ -97,7 +78,6 @@ async function updatePaper(paper_id, paperData) {
     return await response.json()
 }
 
-// delete paper
 async function deletePaper(paper_id) {
     const response = await fetch(`${BASE_URL}/papers/${paper_id}`, {
         method: "DELETE",
@@ -106,9 +86,6 @@ async function deletePaper(paper_id) {
     return await response.json()
 }
 
-// REPORTS 
-
-// fetch all reports
 async function fetchReports() {
     const response = await fetch(`${BASE_URL}/reports`, {
         method: "GET",
@@ -117,7 +94,6 @@ async function fetchReports() {
     return await response.json()
 }
 
-// fetch single paper
 async function fetchReport(report_id) {
     const response = await fetch(`${BASE_URL}/reports/${report_id}`, {
         method: "GET",
@@ -126,7 +102,6 @@ async function fetchReport(report_id) {
     return await response.json()
 }
 
-// add report
 async function addReport(reportData) {
     const response = await fetch(`${BASE_URL}/reports`, {
         method: "POST",
@@ -136,7 +111,6 @@ async function addReport(reportData) {
     return await response.json()
 }
 
-// update report
 async function updateReport(report_id, reportData) {
     const response = await fetch(`${BASE_URL}/reports/${report_id}`, {
         method: "PUT",
@@ -146,7 +120,6 @@ async function updateReport(report_id, reportData) {
     return await response.json()
 }
 
-// delete report
 async function deleteReport(report_id) {
     const response = await fetch(`${BASE_URL}/reports/${report_id}`, {
         method: "DELETE",

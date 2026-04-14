@@ -8,3 +8,4 @@ API_KEY_NAME = os.getenv("API_KEY_NAME", "x-api-key")
 
 if not API_KEY:
     raise RuntimeError("API_KEY is not set in .env file")
+
